@@ -6,17 +6,19 @@ import { TYPES } from '../constans/types';
 import { getData } from '../services/api';
 
 function* setData({ type, ...payload }) {
-  const {id, category} = payload;
+  const {currentCategory} = payload;
+  const titleDrink = { isTitle: true, idDrink: currentCategory, strDrink: currentCategory };
 
 
   yield put({type: TYPES.START_LOADING});
   try {
     yield put({type: TYPES.LOADING});
 
-    const currentCategory = category[id];
     const response = yield call(getData, currentCategory);
 
-    yield put({ type: TYPES.CALL_SUCCESS, payload: response });
+    console.log(response)
+
+    yield put({ type: TYPES.CALL_SUCCESS, payload: [titleDrink, ...response] });
 
   } catch (e) {
     yield put({type: TYPES.SHOW_ERROR});

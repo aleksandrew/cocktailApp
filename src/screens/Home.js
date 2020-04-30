@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import {FlatList, Image, SafeAreaView, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import React, {memo, useEffect, useCallback, useMemo} from 'react';
+import React, {memo, useState, useEffect, useCallback, useMemo} from 'react';
 import {
   Body,
   Button,
@@ -29,13 +29,15 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 export default Home = memo(({navigation}) => {
   // dispatch
   const dispatch = useDispatch();
-  const setData = useCallback(() => dispatch({type: TYPES.SET_DATA}), [dispatch]);
+  const setData = useCallback((currentCategory) => dispatch({type: TYPES.SET_DATA, currentCategory}), [dispatch]);
 
   // state
   const {data, loading, category} = useSelector(state => selector(state));
 
+  const [currentPosition, setCurrentPosition] = useState(0);
+
   useEffect(() => {
-    if (!data) setData('cocoa', 0);
+    // if (!data) setData(['cocoa']);
 
     navigation.setOptions({
       headerRight: () => (
@@ -45,50 +47,44 @@ export default Home = memo(({navigation}) => {
       ),
     });
   }, [setData, navigation]);
-  console.log(data)
+
+  const handleLoad = useCallback(() => {
+    const categoryLenght = category.length;
+    const nextPosition = currentPosition + 1;
+    const nextCategory = category[nextPosition];
+
+    if (currentPosition < categoryLenght) {
+      setData(nextCategory);
+      setCurrentPosition(nextPosition);
+    }
+  });
 
   const dataDrinks = useMemo(() =>
     _.map(data, item => ({
       id: item.idDrink,
       name: item.strDrink,
+      isTitle: item.isTitle,
       uri: {uri: item.strDrinkThumb},
     })), [data]
   );
 
   return (
     <Container>
-      {/*{loading*/}
-      {/*? <Loader />*/}
-      {/*: <Content>*/}
-      {/*<List>*/}
-      {/*<ListItem noBorder>*/}
-      {/*<Text style={styles.text}>{category}</Text>*/}
-      {/*</ListItem>*/}
-      {/*{*/}
-      {/*_.map(dataDrinks, ({id, name, uri}) => (*/}
-      {/*<ListItem key={id} style={styles.list} noBorder thumbnail>*/}
-      {/*<Left>*/}
-      {/*<Thumbnail square style={styles.img} source={uri}/>*/}
-      {/*</Left>*/}
-      {/*<Body>*/}
-      {/*<Text style={styles.text}>{name}</Text>*/}
-      {/*</Body>*/}
-      {/*</ListItem>*/}
-      {/*))*/}
-      {/*}*/}
-      {/*</List>*/}
-      {/*</Content>*/}
-      {/*}*/}
       <SafeAreaView style={{flex: 1}}>
         {loading
           ? <Loader/>
           : <FlatList
-              // extraData={this.state}
-              data={dataDrinks}
-              enableEmptySections={true}
-              keyExtractor={(item, id) => item.id.toString()}
-              renderItem={({item}) => (
-                <ListItem key={item.id} style={styles.list} noBorder thumbnail>
+            data={dataDrinks}
+            refreshing={loading}
+            enableEmptySections={true}
+            onEndThreshold={handleLoad}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({item}) => (
+              item.isTitle
+                ? <ListItem style={styles.listTitle} noBorder>
+                <Text style={styles.text}>{item.name}</Text>
+                </ListItem>
+                : <ListItem style={styles.list} noBorder thumbnail>
                   <Left>
                     <Thumbnail square style={styles.img} source={item.uri}/>
                   </Left>
@@ -96,8 +92,8 @@ export default Home = memo(({navigation}) => {
                   <Text style={styles.text}>{item.name}</Text>
                   </Body>
                 </ListItem>
-              )}
-            />
+            )}
+          />
         }
       </SafeAreaView>
     </Container>
@@ -118,6 +114,6 @@ const styles = StyleSheet.create({
     height: 100,
   },
   list: {
-    marginBottom: 20,
+    margin: 10,
   },
 });
