@@ -25,7 +25,7 @@ class Filter extends Component {
 
   onSubmit = () => {
     this.props.setCategory(this.state.selected);
-    this.props.getData(this.state.selected, 0);
+    this.props.getData(this.state.selected[0]);
     this.props.navigation.navigate(ROUTES.DRINKS);
   };
 
@@ -50,7 +50,6 @@ class Filter extends Component {
           ? <Loader />
           : <>
             <FlatList
-              // extraData={this.state}
               data={data}
               enableEmptySections={true}
               keyExtractor={(item, id) => id.toString()}
@@ -100,6 +99,6 @@ export default connect(
   dispatch => ({
     getDataList: () => dispatch({type: TYPES.GET_DATA_FILTER}),
     setCategory: (category) => dispatch({type: TYPES.CATEGORY, category}),
-    getData: (category, id) => dispatch({type: TYPES.SET_DATA, category, id}),
+    getData: (currentCategory) => dispatch({type: TYPES.SET_DATA, currentCategory}),
   }),
 )(Filter);

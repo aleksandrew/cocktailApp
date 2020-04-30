@@ -16,7 +16,7 @@ const instance = axios.create({
   },
 });
 
-export const getData = (param = 'Ordinary_Drink') => {
+export const getData = (param) => {
   return instance({ method: 'post', url: `${API_PATH}/filter.php?c=${param}`})
     .then(response => response.data.drinks)
 };

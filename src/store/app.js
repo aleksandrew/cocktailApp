@@ -21,7 +21,8 @@ const app = (state = initialState, action) => {
       return {...state, loading: false};
 
     case TYPES.CALL_SUCCESS:
-      return {...state, data: [...action.payload]};
+
+      return {...state, data: state.data ? [...state.data, ...action.payload] : [...action.payload]};
 
     case TYPES.CATEGORY:
       return {...state, category: [...action.category]};
