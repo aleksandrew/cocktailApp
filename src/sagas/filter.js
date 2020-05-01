@@ -9,7 +9,6 @@ import {getDataList} from '../services/api';
 function* getDataFilter() {
   yield put({type: TYPES.START_LOADING});
   try {
-
     const response = yield call(getDataList);
 
     yield put({type: TYPES.SET_DATA_FILTER, payload: response});

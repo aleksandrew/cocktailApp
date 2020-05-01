@@ -1,8 +1,8 @@
 // outsource dependencies
 import {connect} from 'react-redux';
-import React, {Component } from 'react';
+import React, {Component} from 'react';
 import {FlatList, SafeAreaView, StyleSheet} from 'react-native';
-import { Button, CheckBox, Footer, FooterTab, Left, ListItem, Right, Text } from 'native-base';
+import {Button, CheckBox, Footer, FooterTab, Left, ListItem, Right, Text} from 'native-base';
 
 // local dependencies
 import {TYPES} from "../constans/types";
@@ -20,12 +20,16 @@ class Filter extends Component {
   }
 
   componentDidMount() {
+    if (this.props.category) {
+      this.setState({selected: this.props.category})
+    }
+
     this.props.getDataList();
   };
 
   onSubmit = () => {
-    this.props.setCategory(this.state.selected);
     this.props.getData(this.state.selected[0]);
+    this.props.setCategory(this.state.selected);
     this.props.navigation.navigate(ROUTES.DRINKS);
   };
 
@@ -38,7 +42,7 @@ class Filter extends Component {
       tmp.push(id);
     }
 
-    return this.setState(() => ({selected: tmp}))
+    return this.setState({selected: tmp})
   };
 
   render() {
@@ -47,7 +51,7 @@ class Filter extends Component {
     return (
       <SafeAreaView style={{flex: 1}}>
         {loading
-          ? <Loader />
+          ? <Loader/>
           : <>
             <FlatList
               data={data}
@@ -93,12 +97,13 @@ export default connect(
   // mapStateToProps
   state => ({
     data: selector(state).data,
+    category: state.app.category,
     loading: selector(state).loading,
   }),
   // mapDispatchToProps
   dispatch => ({
     getDataList: () => dispatch({type: TYPES.GET_DATA_FILTER}),
-    setCategory: (category) => dispatch({type: TYPES.CATEGORY, category}),
+    setCategory: (payload) => dispatch({ type: TYPES.CALL_CATEGORY, payload }),
     getData: (currentCategory) => dispatch({type: TYPES.SET_DATA, currentCategory}),
   }),
 )(Filter);
