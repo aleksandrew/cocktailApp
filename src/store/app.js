@@ -7,7 +7,8 @@ const initialState = {
   data: null,
   error: false,
   loading: true,
-  category: 'Ordinary Drink',
+  category: null,
+  // category: ['Ordinary Drink', 'Cocktail', 'Milk / Float / Shake', 'Other/Unknown', 'Cocoa', 'Shot', 'Coffee / Tea', 'Homemade Liqueur', 'Punch / Party Drink', 'Beer', 'Soft Drink / Soda' ],
 };
 
 export const selector = (state) => state.app;
@@ -21,11 +22,10 @@ const app = (state = initialState, action) => {
       return {...state, loading: false};
 
     case TYPES.CALL_SUCCESS:
+      return {...state, data: [...state.data, ...action.payload]};
 
-      return {...state, data: state.data ? [...state.data, ...action.payload] : [...action.payload]};
-
-    case TYPES.CATEGORY:
-      return {...state, category: [...action.category]};
+    case TYPES.CALL_CATEGORY:
+      return {...state, category: [...action.payload]};
 
     default:
       return state;

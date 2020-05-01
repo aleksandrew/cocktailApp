@@ -29,15 +29,20 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 export default Home = memo(({navigation}) => {
   // dispatch
   const dispatch = useDispatch();
+  const getALLCategory = useCallback(() => dispatch({type: TYPES.GET_CATEGORY}), [dispatch]);
   const setData = useCallback((currentCategory) => dispatch({type: TYPES.SET_DATA, currentCategory}), [dispatch]);
 
   // state
   const {data, loading, category} = useSelector(state => selector(state));
 
   const [currentPosition, setCurrentPosition] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    // if (!data) setData(['cocoa']);
+    if ( !category ) {
+      getALLCategory()
+    }
+    // setData(category[0]);
 
     navigation.setOptions({
       headerRight: () => (
@@ -54,16 +59,29 @@ export default Home = memo(({navigation}) => {
     const nextCategory = category[nextPosition];
 
     if (currentPosition < categoryLenght) {
-      setData(nextCategory);
       setCurrentPosition(nextPosition);
+      setRefreshing(true);
+      setData(nextCategory);
+    }
+  }, []);
+
+  const _handleLoadMore = useCallback(() => {
+    const categoryLenght = category.length;
+    const nextPosition = currentPosition + 1;
+    const nextCategory = category[nextPosition];
+
+    if (currentPosition < categoryLenght) {
+      setCurrentPosition(nextPosition);
+      setRefreshing(true);
+      setData(nextCategory);
     }
   });
 
   const dataDrinks = useMemo(() =>
     _.map(data, item => ({
-      id: item.idDrink,
       name: item.strDrink,
       isTitle: item.isTitle,
+      id: item.idDrink.toString(),
       uri: {uri: item.strDrinkThumb},
     })), [data]
   );
@@ -74,11 +92,17 @@ export default Home = memo(({navigation}) => {
         {loading
           ? <Loader/>
           : <FlatList
+            extraData={dataDrinks}
             data={dataDrinks}
-            refreshing={loading}
-            enableEmptySections={true}
-            onEndThreshold={handleLoad}
-            keyExtractor={(item) => item.id.toString()}
+            // enableEmptySections={true}
+            onEndReached={_handleLoadMore}
+            // onRefresh={handleLoad}
+            // refreshing={loading} //
+            // style={{ width: '100%' }}
+            // onEndThreshold={0}
+            onEndReachedThreshold={0.5}
+            // initialNumToRender={10}
+            keyExtractor={(item) => item.id}
             renderItem={({item}) => (
               item.isTitle
                 ? <ListItem style={styles.listTitle} noBorder>
