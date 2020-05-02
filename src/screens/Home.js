@@ -29,20 +29,21 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 export default Home = memo(({navigation}) => {
   // dispatch
   const dispatch = useDispatch();
-  const getALLCategory = useCallback(() => dispatch({type: TYPES.GET_CATEGORY}), [dispatch]);
+  const getAllCategory = useCallback(() => dispatch({type: TYPES.GET_CATEGORY}), [dispatch]);
   const setData = useCallback((currentCategory) => dispatch({type: TYPES.SET_DATA, currentCategory}), [dispatch]);
 
   // state
-  const {data, loading, category} = useSelector(state => selector(state));
+  const {data, loading, category} = useSelector(selector);
 
+  console.log(data)
   const [currentPosition, setCurrentPosition] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    if ( !category ) {
-      getALLCategory()
-    }
-    // setData(category[0]);
+    console.log(category)
+    // if ( !category ) {
+    //   getAllCategory()
+    // }
+    category && setData(category[0]);
 
     navigation.setOptions({
       headerRight: () => (
@@ -51,7 +52,7 @@ export default Home = memo(({navigation}) => {
         </Button>
       ),
     });
-  }, [setData, navigation]);
+  }, [category, setData, navigation]);
 
   const handleLoad = useCallback(() => {
     const categoryLenght = category.length;
@@ -60,7 +61,6 @@ export default Home = memo(({navigation}) => {
 
     if (currentPosition < categoryLenght) {
       setCurrentPosition(nextPosition);
-      setRefreshing(true);
       setData(nextCategory);
     }
   }, []);
@@ -72,18 +72,17 @@ export default Home = memo(({navigation}) => {
 
     if (currentPosition < categoryLenght) {
       setCurrentPosition(nextPosition);
-      setRefreshing(true);
       setData(nextCategory);
     }
-  });
+  }, [currentPosition, category, setData]);
 
   const dataDrinks = useMemo(() =>
-    _.map(data, item => ({
+    _.uniqBy(_.map(data, item => ({
       name: item.strDrink,
       isTitle: item.isTitle,
       id: item.idDrink.toString(),
       uri: {uri: item.strDrinkThumb},
-    })), [data]
+    })), 'id'), [data]
   );
 
   return (
@@ -92,21 +91,15 @@ export default Home = memo(({navigation}) => {
         {loading
           ? <Loader/>
           : <FlatList
-            extraData={dataDrinks}
             data={dataDrinks}
-            // enableEmptySections={true}
-            onEndReached={_handleLoadMore}
-            // onRefresh={handleLoad}
-            // refreshing={loading} //
-            // style={{ width: '100%' }}
-            // onEndThreshold={0}
+            extraData={dataDrinks}
             onEndReachedThreshold={0.5}
-            // initialNumToRender={10}
+            onEndReached={_handleLoadMore}
             keyExtractor={(item) => item.id}
             renderItem={({item}) => (
               item.isTitle
                 ? <ListItem style={styles.listTitle} noBorder>
-                <Text style={styles.text}>{item.name}</Text>
+                  <Text style={styles.text}>{item.name}</Text>
                 </ListItem>
                 : <ListItem style={styles.list} noBorder thumbnail>
                   <Left>
