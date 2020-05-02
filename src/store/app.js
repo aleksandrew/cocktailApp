@@ -4,7 +4,7 @@
 import { TYPES } from '../constans/types';
 
 const initialState = {
-  data: null,
+  data: [],
   error: false,
   loading: true,
   category: null,

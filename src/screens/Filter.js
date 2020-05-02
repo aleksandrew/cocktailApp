@@ -1,6 +1,6 @@
 // outsource dependencies
 import {connect} from 'react-redux';
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {FlatList, SafeAreaView, StyleSheet} from 'react-native';
 import {Button, CheckBox, Footer, FooterTab, Left, ListItem, Right, Text} from 'native-base';
 
@@ -11,7 +11,7 @@ import Loader from '../components/Loader';
 import {ROUTES} from "../constans/routes";
 
 
-class Filter extends Component {
+class Filter extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -42,11 +42,12 @@ class Filter extends Component {
       tmp.push(id);
     }
 
-    return this.setState({selected: tmp})
+    return this.setState({selected: [...tmp]})
   };
 
   render() {
     const {loading, data} = this.props;
+    console.log(this.state.selected)
 
     return (
       <SafeAreaView style={{flex: 1}}>
@@ -65,7 +66,7 @@ class Filter extends Component {
                   <Right>
                     <CheckBox
                       onPress={() => this.onCheckBoxPress(item.strCategory)}
-                      checked={this.state.selected.some(i => i === item.strCategory)}
+                      checked={this.state.selected.includes(item.strCategory)}
                     />
                   </Right>
                 </ListItem>
