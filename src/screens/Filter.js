@@ -1,17 +1,16 @@
 // outsource dependencies
 import _ from 'lodash';
-import {connect} from 'react-redux';
 import {useDispatch, useSelector} from 'react-redux';
-import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, SafeAreaView, StyleSheet} from 'react-native';
+import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {Button, CheckBox, Footer, FooterTab, Left, ListItem, Right, Text} from 'native-base';
 
 // local dependencies
 import {TYPES} from "../constans/types";
-import {selector as filterSelector} from '../store/filter';
-import {selector as appSelector} from '../store/app';
 import Loader from '../components/Loader';
 import {ROUTES} from "../constans/routes";
+import {selector as appSelector} from '../store/app';
+import {selector as filterSelector} from '../store/filter';
 
 
 export default Filter = memo(({navigation}) => {

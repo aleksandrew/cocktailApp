@@ -1,4 +1,5 @@
 export const TYPES = {
+  DATA: 'DATA',
   GET_DATA: 'SET_DATA',
   SET_DATA: 'SET_DATA',
   SHOW_ERROR: 'SHOW_ERROR',

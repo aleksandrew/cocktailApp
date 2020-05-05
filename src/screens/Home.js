@@ -1,7 +1,7 @@
 // outsource dependencies
 import _ from 'lodash';
-import {FlatList, Image, SafeAreaView, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import {FlatList, Image, SafeAreaView, StyleSheet} from 'react-native';
 import React, {memo, useState, useEffect, useCallback, useMemo} from 'react';
 import { Body, Button, Container, Left, ListItem, Text, Thumbnail } from 'native-base';
 
@@ -20,17 +20,20 @@ export default Home = memo(({navigation}) => {
   const setData = useCallback((currentCategory) => dispatch({type: TYPES.SET_DATA, currentCategory}), [dispatch]);
 
   // state
-  const {data, loading, category} = useSelector(selector);
+  const {uploadedData, data, loading, category} = useSelector(selector);
 
-  console.log(data)
   const [currentPosition, setCurrentPosition] = useState(0);
+  const [stateData, setStateData] = useState(null);
 
   useEffect(() => {
-    console.log(category)
-    // if ( !category ) {
-    //   getAllCategory()
-    // }
-    category && setData(category[0]);
+    if ( !category ) {
+      getAllCategory()
+    } else {
+      setData(category[0]);
+      // stateData ? setStateData(stateData, uploadedData) : setStateData(uploadedData);
+    }
+    console.log(uploadedData)
+
 
     navigation.setOptions({
       headerRight: () => (
@@ -41,7 +44,7 @@ export default Home = memo(({navigation}) => {
     });
   }, [category, setData, navigation]);
 
-  const _handleLoadMore = useCallback(() => {
+  const handleLoadMore = useCallback(() => {
     const categoryLenght = category.length;
     const nextPosition = currentPosition + 1;
     const nextCategory = category[nextPosition];
@@ -68,9 +71,10 @@ export default Home = memo(({navigation}) => {
           ? <Loader/>
           : <FlatList
             data={dataDrinks}
+            extraData={dataDrinks}
             initialNumToRender={10}
             onEndReachedThreshold={0.5}
-            onEndReached={_handleLoadMore}
+            onEndReached={handleLoadMore}
             keyExtractor={(item) => item.id}
             renderItem={({item}) => (
               item.isTitle
